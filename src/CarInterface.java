@@ -9,14 +9,34 @@ public interface CarInterface {
     /*test cases:  */
     public void MoveForward();
 
+    /*desc: query the 2 sensors to check the distance until object on right */
+    /*Pre cond:  */
+    /*Post cond: */
+    /*test cases:  */
     public boolean isEmpty();
 
+    /*desc: */
+    /*Pre cond:  */
+    /*Post cond: */
+    /*test cases:  */
     public void MoveBackward();
 
+    /*desc: */
+    /*Pre cond:  */
+    /*Post cond: */
+    /*test cases:  */
     public void Park();
 
+    /*desc: */
+    /*Pre cond:  */
+    /*Post cond: */
+    /*test cases:  */
     public void UnPark();
 
-    public void WhereIs();
+    /*desc: */
+    /*Pre cond:  */
+    /*Post cond: */
+    /*test cases:  */
+    public CarState WhereIs();
 
 }
