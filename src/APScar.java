@@ -84,12 +84,14 @@ public class APScar implements CarInterface {
 
     // park drift style
     public void Park() {
-
+        this.car.setPosition(this.car.getPosition() - 5);
+        this.car.setParked(true);
     }
 
     // unpark like a king
     public void UnPark() {
-
+        this.car.setPosition(this.car.getPosition() + 5);
+        this.car.setParked(false);
     }
 
     // return both position and isPark state
