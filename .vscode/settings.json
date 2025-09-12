@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": [
+        "src",
+        "tests"
+    ],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+        "c:\\Users\\erikn\\OneDrive - Högskolan i Halmstad\\Documents\\GitHub\\Testning-och-verifikation-av-inbyggda-system\\lib\\hamcrest-core-1.3.jar",
+        "c:\\Users\\erikn\\OneDrive - Högskolan i Halmstad\\Documents\\GitHub\\Testning-och-verifikation-av-inbyggda-system\\lib\\junit-4.13.2.jar"
+    ]
+}
