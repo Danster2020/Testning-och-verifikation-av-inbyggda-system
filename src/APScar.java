@@ -1,30 +1,41 @@
 
 public class APScar implements CarInterface {
-    CarState car;
-    int sensor1; // range sensor from 0-200 for next empty space
-    int sensor2;
+    private CarState carState;
+    int ROAD_LENGTH = 500;
 
     public APScar() {
-        this.car = new CarState();
+        this.carState = new CarState();
     }
 
-    public void MoveForward() {
+    public CarState MoveForward() {
+        int currPos = this.carState.getPosition();
+
+        // do not move forward if end of road
+        if (currPos == ROAD_LENGTH - 1) {
+            return this.carState;
+        }
+
         // Move car by 1 meter max 500
-        this.car.setPosition(car.getPosition() + 1);
+        this.carState.setPosition(carState.getPosition() + 1);
 
         // check for isEmpty
         if (isEmpty()) {
-            this.car.setFreeParkingSpace(car.getFreeParkingSpace() + 1);
+            this.carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() + 1);
         } else {
-            this.car.setFreeParkingSpace(0);
+            this.carState.setFreeParkingSpaceCounter(0);
         }
-        // return struct with carState
 
+        if(carState.getFreeParkingSpaceCounter() >= 5){
+            this.carState.setFreeParkingSpaceIndex(carState.getPosition());
+        }
+
+        return this.carState;
     }
 
-    public int[][] querySensor() {
-        int[] s1 = { 143, 177, 187, 199, 201 };
-        int[] s2 = { 176, 186, 187, 200, 201 };
+    // range sensor from 0-200 for next empty space
+    public int[][] querySensor() { 
+        int[] s1 = { 143, 177, 187, 199, 184 };
+        int[] s2 = { 176, 186, 187, 200, 199 };
         int[][] sDataArray = { s1, s2 };
         return sDataArray;
     }
@@ -45,7 +56,7 @@ public class APScar implements CarInterface {
         }
 
         int totalSum = 0;
-        for (int value: processedSensorData) {
+        for (int value : processedSensorData) {
             totalSum += value;
         }
         int sensorValue = totalSum / nrOfSensors;
@@ -54,54 +65,67 @@ public class APScar implements CarInterface {
     }
 
     public boolean isEmpty() {
-        // check the sensors
         int sensorDistance = processSensorData();
-        int minimumFreeSpace = 3;
+        int minimumFreeSpace = 50;
 
-        if(sensorDistance < minimumFreeSpace){
+        if (sensorDistance < minimumFreeSpace) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
-        
     }
 
-    public void MoveBackward() {
-        if (this.car.getPosition() == 0) {
+    public CarState MoveBackward() {
+        if (this.carState.getPosition() == 0) {
 
         } else {
-            this.car.setPosition(car.getPosition() - 1);
+            this.carState.setPosition(carState.getPosition() - 1);
 
             if (isEmpty()) {
-                this.car.setFreeParkingSpace(car.getFreeParkingSpace() + 1);
+                this.carState.setFreeParkingSpaceIndex(carState.getFreeParkingSpaceIndex() + 1);
             } else {
-                this.car.setFreeParkingSpace(0);
+                this.carState.setFreeParkingSpaceIndex(0);
             }
         }
+
+        return this.carState;
 
     }
 
     // park drift style
     public void Park() {
-        this.car.setPosition(this.car.getPosition() - 5);
-        this.car.setParked(true);
+
+        // scenario 1: find parking space and park.
+        while(carState.getPosition() < ROAD_LENGTH){
+            MoveForward();
+            if(carState.getFreeParkingSpaceCounter() >= 5){
+                // park
+                for (int i = 0; i < 4; i++) {
+                    MoveBackward();
+                }
+                this.carState.setParked(true);
+                return;
+            }
+        }
+
+        // scenario 2: park at latest found parking space.
+        
+        
     }
 
     // unpark like a king
     public void UnPark() {
-        this.car.setPosition(this.car.getPosition() + 5);
-        this.car.setParked(false);
+        this.carState.setPosition(this.carState.getPosition() + 5);
+        this.carState.setParked(false);
     }
 
     // return both position and isPark state
     public CarState WhereIs() {
-        return this.car.getCarState();
+        return this.carState;
     }
 
-    // public CarState getCarState()
-    // {
-    // return this.carState;
-    // }
+    public CarState getCarState() {
+        return this.carState;
+    }
 
 }

@@ -1,13 +1,13 @@
 
 public interface CarInterface {
 
-    /* desc: Move the car forward by 1 increment by quering isEmpty(); 
-    and returns current position of car in a struct and situation 
-    of detected parking places up to now, cant move out of bounds*/
+    /* desc: Move the car forward by 1 and check isEmpty(); 
+    returns carState struct of detected parking places up 
+    to now, cant move out of bounds*/
     /*Pre cond: Check if its parked or not cant move while parked and its current position*/
     /*Post cond: Checked if moved */
     /*test cases:  */
-    public void MoveForward();
+    public CarState MoveForward();
 
     /*desc: query the 2 sensors to check the distance until object on right */
     /*Pre cond:  */
@@ -19,7 +19,7 @@ public interface CarInterface {
     /*Pre cond:  */
     /*Post cond: */
     /*test cases:  */
-    public void MoveBackward();
+    public CarState MoveBackward();
 
     /*desc: */
     /*Pre cond:  */

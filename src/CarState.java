@@ -2,18 +2,18 @@
 public class CarState {
     private int position;
     private boolean isParked;
-    private int freeParkingSpace;
+    private int freeParkingSpaceIndex;
+    private int freeParkingSpaceCounter;
 
     public CarState(){
         position = 0;
         isParked = false;
-        freeParkingSpace = 0;
+        freeParkingSpaceIndex = -1;
+        freeParkingSpaceCounter = 0;
     }
 
-    public CarState getCarState() {
-        return this;
-    }
-
+    // Getters
+    
     public int getPosition() {
         return position;
     }
@@ -22,9 +22,15 @@ public class CarState {
         return isParked;
     }
 
-    public int getFreeParkingSpace() {
-        return freeParkingSpace;
+    public int getFreeParkingSpaceIndex() {
+        return freeParkingSpaceIndex;
     }
+
+    public int getFreeParkingSpaceCounter() {
+        return freeParkingSpaceCounter;
+    }
+    
+    // Setters
 
     public void setPosition(int position) {
         this.position = position;
@@ -34,8 +40,11 @@ public class CarState {
         this.isParked = isParked;
     }
 
-    public void setFreeParkingSpace(int freeParkingSpace) {
-        this.freeParkingSpace = freeParkingSpace;
+    public void setFreeParkingSpaceIndex(int freeParkingSpace) {
+        this.freeParkingSpaceIndex = freeParkingSpace;
     }
-    
+
+    public void setFreeParkingSpaceCounter(int freeParkingSpaceCounter) {
+        this.freeParkingSpaceCounter = freeParkingSpaceCounter;
+    }
 }
