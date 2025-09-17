@@ -25,7 +25,7 @@ public class APScar implements CarInterface {
             this.carState.setFreeParkingSpaceCounter(0);
         }
 
-        if(carState.getFreeParkingSpaceCounter() >= 5){
+        if (carState.getFreeParkingSpaceCounter() >= 5) {
             this.carState.setFreeParkingSpaceIndex(carState.getPosition());
         }
 
@@ -33,14 +33,14 @@ public class APScar implements CarInterface {
     }
 
     // range sensor from 0-200 for next empty space
-    public int[][] querySensor() { 
+    private int[][] querySensor() {
         int[] s1 = { 143, 177, 187, 199, 184 };
         int[] s2 = { 176, 186, 187, 200, 199 };
         int[][] sDataArray = { s1, s2 };
         return sDataArray;
     }
 
-    public int processSensorData() {
+    private int processSensorData() {
         int[][] sensorData = querySensor();
         int nrOfSensors = sensorData.length;
         int[] processedSensorData = new int[nrOfSensors];
@@ -76,29 +76,35 @@ public class APScar implements CarInterface {
     }
 
     public CarState MoveBackward() {
+        // if start of street do not move backwards
         if (this.carState.getPosition() == 0) {
+            return this.carState;
+        }
 
+        // Move car backwards by 1 meter
+        this.carState.setPosition(carState.getPosition() - 1);
+
+        // check for isEmpty
+        if (isEmpty()) {
+            this.carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() + 1);
         } else {
-            this.carState.setPosition(carState.getPosition() - 1);
+            this.carState.setFreeParkingSpaceCounter(0);
+        }
 
-            if (isEmpty()) {
-                this.carState.setFreeParkingSpaceIndex(carState.getFreeParkingSpaceIndex() + 1);
-            } else {
-                this.carState.setFreeParkingSpaceIndex(0);
-            }
+        if (carState.getFreeParkingSpaceCounter() >= 5) {
+            this.carState.setFreeParkingSpaceIndex(carState.getPosition());
         }
 
         return this.carState;
-
     }
 
     // park drift style
     public void Park() {
 
         // scenario 1: find parking space and park.
-        while(carState.getPosition() < ROAD_LENGTH){
+        while (carState.getPosition() < ROAD_LENGTH) {
             MoveForward();
-            if(carState.getFreeParkingSpaceCounter() >= 5){
+            if (carState.getFreeParkingSpaceCounter() >= 5) {
                 // park
                 for (int i = 0; i < 4; i++) {
                     MoveBackward();
@@ -109,13 +115,16 @@ public class APScar implements CarInterface {
         }
 
         // scenario 2: park at latest found parking space.
-        
-        
+
     }
 
     // unpark like a king
     public void UnPark() {
-        this.carState.setPosition(this.carState.getPosition() + 5);
+        //very important set 1
+        this.carState.setFreeParkingSpaceCounter(1);
+        for (int i = 0; i < 4; i++) {
+            MoveForward();
+        }
         this.carState.setParked(false);
     }
 
@@ -126,6 +135,7 @@ public class APScar implements CarInterface {
 
     public CarState getCarState() {
         return this.carState;
+
     }
 
 }
