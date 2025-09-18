@@ -2,12 +2,19 @@
 public class APScar implements CarInterface {
     private CarState carState;
     int ROAD_LENGTH = 500;
+    boolean isEmptyReturn = false; // used for testing
 
     public APScar() {
         this.carState = new CarState();
     }
 
     public CarState MoveForward() {
+
+        // do not move forward if parked
+        if (carState.getIsParked() == true) {
+            return this.carState;
+        }
+
         int currPos = this.carState.getPosition();
 
         // do not move forward if end of road
@@ -65,14 +72,17 @@ public class APScar implements CarInterface {
     }
 
     public boolean isEmpty() {
-        int sensorDistance = processSensorData();
-        int minimumFreeSpace = 50;
+        // for future use
+        // int sensorDistance = processSensorData();
+        // int minimumFreeSpace = 100;
 
-        if (sensorDistance < minimumFreeSpace) {
-            return false;
-        } else {
-            return true;
-        }
+        // if (sensorDistance < minimumFreeSpace) {
+        // return false;
+        // } else {
+        // return true;
+        // }
+
+        return this.isEmptyReturn;
     }
 
     public CarState MoveBackward() {
@@ -98,34 +108,52 @@ public class APScar implements CarInterface {
         return this.carState;
     }
 
+    private void parallelReverseParkingManeuver() {
+        isEmptyReturn = true;
+        for (int i = 0; i < 4; i++) {
+            MoveBackward();
+        }
+        this.carState.setParked(true);
+        return;
+    }
+
     // park drift style
     public void Park() {
 
-        // scenario 1: find parking space and park.
+        // scenario 1: park at latest found parking space.
+        int carSpaceIndex = carState.getFreeParkingSpaceIndex();
+        if (carSpaceIndex != -1 && carSpaceIndex < carState.getPosition()) {
+            while (carState.getPosition() > carSpaceIndex) {
+                MoveBackward();
+            }
+            parallelReverseParkingManeuver();
+            return;
+        }
+
+        // scenario 2: find parking space and park.
         while (carState.getPosition() < ROAD_LENGTH) {
             MoveForward();
             if (carState.getFreeParkingSpaceCounter() >= 5) {
                 // park
-                for (int i = 0; i < 4; i++) {
-                    MoveBackward();
-                }
-                this.carState.setParked(true);
+                parallelReverseParkingManeuver();
                 return;
             }
         }
-
-        // scenario 2: park at latest found parking space.
 
     }
 
     // unpark like a king
     public void UnPark() {
-        //very important set 1
+        // if car is already unparked
+        if(carState.getIsParked() == false){
+            return;
+        }
+        this.carState.setParked(false);
+        // very important set 1
         this.carState.setFreeParkingSpaceCounter(1);
         for (int i = 0; i < 4; i++) {
             MoveForward();
         }
-        this.carState.setParked(false);
     }
 
     // return both position and isPark state
@@ -135,7 +163,6 @@ public class APScar implements CarInterface {
 
     public CarState getCarState() {
         return this.carState;
-
     }
 
 }
