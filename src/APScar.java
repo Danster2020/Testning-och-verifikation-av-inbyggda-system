@@ -119,6 +119,10 @@ public class APScar implements CarInterface {
 
     // park drift style
     public void Park() {
+        // if car is already parked
+        if (getCarState().getIsParked() == true) {
+            return;
+        }
 
         // scenario 1: park at latest found parking space.
         int carSpaceIndex = WhereIs().getFreeParkingSpaceIndex();
@@ -145,7 +149,7 @@ public class APScar implements CarInterface {
     // unpark like a king
     public void UnPark() {
         // if car is already unparked
-        if(WhereIs().getIsParked() == false){
+        if (WhereIs().getIsParked() == false) {
             return;
         }
         this.WhereIs().setParked(false);

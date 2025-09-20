@@ -28,8 +28,9 @@ public class CarTest {
         boolean isEmpty = this.car.isEmpty();
         assertEquals(false, isEmpty);
     }
+
     @Test
-    public void isEmpty(){
+    public void isEmpty() {
         car.isEmptyReturn = true;
         boolean isEmpty = this.car.isEmpty();
         assertEquals(true, isEmpty);
@@ -46,7 +47,7 @@ public class CarTest {
     }
 
     @Test
-    public void carMovesForwardWhileParked(){
+    public void carMovesForwardWhileParked() {
         car.getCarState().setParked(true);
         int orgPos = car.getCarState().getPosition();
         car.MoveForward();
@@ -84,7 +85,7 @@ public class CarTest {
     }
 
     @Test
-    public void carMovesBackwardWhileParked(){
+    public void carMovesBackwardWhileParked() {
         car.getCarState().setParked(true);
         int orgPos = car.getCarState().getPosition();
         car.MoveBackward();
@@ -93,7 +94,19 @@ public class CarTest {
     }
 
     @Test
-    public void searchForParkingSpaceAndPark(){
+    public void parkAtLatestFoundParkingSpace() {
+        // assume start somewhere on road
+        car.isEmptyReturn = false;
+        car.getCarState().setFreeParkingSpaceIndex(10);
+        car.getCarState().setPosition(15);
+        car.Park();
+
+        assertEquals(6, car.getCarState().getPosition());
+        assertEquals(true, car.getCarState().getIsParked());
+    }
+
+    @Test
+    public void searchForParkingSpaceAndPark() {
         car.isEmptyReturn = true;
         car.Park();
         assertEquals(1, car.getCarState().getPosition());
@@ -101,29 +114,25 @@ public class CarTest {
     }
 
     @Test
-    public void carUnParkWhileUnParked(){
+    public void carParkWhileParked() {
+        car.getCarState().setParked(true);
+        int orgPos = car.getCarState().getPosition();
+        car.Park();
+        // should not have moved and stayed as parked
+        assertEquals(true, car.getCarState().getIsParked());
+        assertEquals(orgPos, car.getCarState().getPosition());
+    }
+
+    @Test
+    public void carUnParkWhileUnParked() {
         int orgPos = car.getCarState().getPosition();
         car.UnPark();
         assertEquals(false, car.getCarState().getIsParked());
         assertEquals(orgPos, car.getCarState().getPosition());
     }
 
-    // TODO
     @Test
-    public void parkAtLatestFoundParkingSpace(){
-        //assume start somewhere on road
-        car.isEmptyReturn = false;
-        car.getCarState().setFreeParkingSpaceIndex(10);
-        car.getCarState().setPosition(15);
-
-        car.Park();
-
-        assertEquals(6, car.getCarState().getPosition());
-        assertEquals(true, car.getCarState().getIsParked());  
-    }
-
-    @Test
-    public void carUnparkWhileParked(){
+    public void carUnparkWhileParked() {
         car.isEmptyReturn = true;
         car.getCarState().setParked(true);
         int originalPos = car.getCarState().getPosition();
@@ -133,9 +142,9 @@ public class CarTest {
     }
 
     @Test
-    public void carWhereIs(){
+    public void carWhereIs() {
         CarState currentPos = car.WhereIs();
-        
+
         int position = car.getCarState().getPosition();
         boolean parked = car.getCarState().getIsParked();
         int parkIndex = car.getCarState().getFreeParkingSpaceIndex();
