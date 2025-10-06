@@ -87,6 +87,7 @@ public class CarTest {
     @Test
     public void carMovesBackwardWhileParked() {
         car.getCarState().setParked(true);
+        car.getCarState().setPosition(2); // prevents start of road from triggering
         int orgPos = car.getCarState().getPosition();
         car.MoveBackward();
 

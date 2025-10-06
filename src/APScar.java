@@ -24,7 +24,7 @@ public class APScar implements CarInterface {
         }
 
         // Move car forward 1 meter, max 500, update parking pace index and parking space counter
-        //test from carMovesForward
+        //test from carMovesForward()
         this.WhereIs().setPosition(WhereIs().getPosition() + 1);
 
         //the parking index and counter updates
@@ -92,6 +92,12 @@ public class APScar implements CarInterface {
     }
 
     public CarState MoveBackward() {
+        // do not move backward if parked
+        //from test carMovesBackwardWhileParked()
+        if (WhereIs().getIsParked() == true) {
+            return this.WhereIs();
+        }
+
         // if start of street do not move backwards 
         //test from carMovesBackwardAtStartOfStreet()
         if (this.WhereIs().getPosition() == 0) {
@@ -167,6 +173,8 @@ public class APScar implements CarInterface {
             return;
         }
 
+        // car unparks while it is parked.
+        // test from carUnparkWhileParked()
         this.WhereIs().setParked(false);
         // very important set 1
         this.WhereIs().setFreeParkingSpaceCounter(1);
