@@ -11,21 +11,23 @@ public class APScar implements CarInterface {
     public CarState MoveForward() {
 
         // do not move forward if parked
+        //from test carMovesForwardWhileParked()
         if (WhereIs().getIsParked() == true) {
             return this.WhereIs();
         }
 
-        int currPos = this.WhereIs().getPosition();
-
         // do not move forward if end of road
+        //test from carMovesForwardAtEndOfRoad()
+        int currPos = this.WhereIs().getPosition();
         if (currPos == ROAD_LENGTH - 1) {
             return this.WhereIs();
         }
 
-        // Move car by 1 meter max 500
+        // Move car forward 1 meter, max 500, update parking pace index and parking space counter
+        //test from carMovesForward
         this.WhereIs().setPosition(WhereIs().getPosition() + 1);
 
-        // check for isEmpty
+        //the parking index and counter updates
         if (isEmpty()) {
             this.WhereIs().setFreeParkingSpaceCounter(WhereIs().getFreeParkingSpaceCounter() + 1);
         } else {
@@ -39,6 +41,7 @@ public class APScar implements CarInterface {
         return this.WhereIs();
     }
 
+    //not in use phase 1
     // range sensor from 0-200 for next empty space
     private int[][] querySensor() {
         int[] s1 = { 143, 177, 187, 199, 184 };
@@ -47,6 +50,7 @@ public class APScar implements CarInterface {
         return sDataArray;
     }
 
+    //not in use phase 1
     private int processSensorData() {
         int[][] sensorData = querySensor();
         int nrOfSensors = sensorData.length;
@@ -82,19 +86,23 @@ public class APScar implements CarInterface {
         // return true;
         // }
 
+        //quick solution for test return 
+        //test from isNotEmpty() and IsEmpty()
         return this.isEmptyReturn;
     }
 
     public CarState MoveBackward() {
-        // if start of street do not move backwards
+        // if start of street do not move backwards 
+        //test from carMovesBackwardAtStartOfStreet()
         if (this.WhereIs().getPosition() == 0) {
             return this.WhereIs();
         }
 
-        // Move car backwards by 1 meter
+        // Move car back 1 meter, max 500, update parking pace index and parking space counter
+        //test from carMovesBackward()
         this.WhereIs().setPosition(WhereIs().getPosition() - 1);
 
-        // check for isEmpty
+        //the parking index and counter updates
         if (isEmpty()) {
             this.WhereIs().setFreeParkingSpaceCounter(WhereIs().getFreeParkingSpaceCounter() + 1);
         } else {
@@ -109,6 +117,8 @@ public class APScar implements CarInterface {
     }
 
     private void parallelReverseParkingManeuver() {
+        //auto park function that parkes at current park index when at correct index
+        //called from park() 
         isEmptyReturn = true;
         for (int i = 0; i < 4; i++) {
             MoveBackward();
@@ -119,12 +129,14 @@ public class APScar implements CarInterface {
 
     // park drift style
     public void Park() {
-        // if car is already parked
+        //if car is already parked
+        //test from carParkWhileParked()
         if (getCarState().getIsParked() == true) {
             return;
         }
 
         // scenario 1: park at latest found parking space.
+        //test from parkAtLatestFoundParkingSpace()
         int carSpaceIndex = WhereIs().getFreeParkingSpaceIndex();
         if (carSpaceIndex != -1 && carSpaceIndex < WhereIs().getPosition()) {
             while (WhereIs().getPosition() > carSpaceIndex) {
@@ -135,6 +147,7 @@ public class APScar implements CarInterface {
         }
 
         // scenario 2: find parking space and park.
+        //test from searchForParkingSpaceAndPark()
         while (WhereIs().getPosition() < ROAD_LENGTH) {
             MoveForward();
             if (WhereIs().getFreeParkingSpaceCounter() >= 5) {
@@ -149,9 +162,11 @@ public class APScar implements CarInterface {
     // unpark like a king
     public void UnPark() {
         // if car is already unparked
+        //test from carUnParkWhileUnParked()
         if (WhereIs().getIsParked() == false) {
             return;
         }
+
         this.WhereIs().setParked(false);
         // very important set 1
         this.WhereIs().setFreeParkingSpaceCounter(1);
@@ -161,6 +176,7 @@ public class APScar implements CarInterface {
     }
 
     // return both position and isPark state
+    //from test carWhereIs()
     public CarState WhereIs() {
         return this.carState;
     }
