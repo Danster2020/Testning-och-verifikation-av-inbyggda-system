@@ -1,10 +1,20 @@
+package javaproject;
 import org.junit.*;
+import org.junit.runner.RunWith;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@RunWith(org.mockito.junit.MockitoJUnitRunner.class)
 public class CarTest {
-
     APScar car;
+    APScar mockedCar = mock(APScar.class);
     int ROAD_LENGTH = 500;
 
     @Before // before each test
@@ -15,6 +25,16 @@ public class CarTest {
         this.car.getCarState().setPosition(0);
         this.car.getCarState().setParked(false);
     }
+
+    @Test
+    public void sanity() {
+        assertNotNull(car);
+    }
+
+    // @Test
+    // public void randomTest() {
+    //     when(this.mockedCar.isEmpty()).thenReturn(false);
+    // }
 
     @Test
     public void isNotParked() {

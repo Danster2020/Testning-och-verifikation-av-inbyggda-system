@@ -1,3 +1,4 @@
+package javaproject;
 
 public interface CarInterface {
 

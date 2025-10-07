@@ -1,3 +1,4 @@
+package javaproject;
 
 public class CarState {
     private int position;
