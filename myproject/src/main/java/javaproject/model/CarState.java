@@ -1,4 +1,4 @@
-package javaproject;
+package javaproject.model;
 
 public class CarState {
     private int position;

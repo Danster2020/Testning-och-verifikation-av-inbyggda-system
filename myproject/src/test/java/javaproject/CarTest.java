@@ -5,11 +5,14 @@ import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import javaproject.model.APScar;
+import javaproject.model.CarState;
 
 @RunWith(org.mockito.junit.MockitoJUnitRunner.class)
 public class CarTest {
@@ -29,6 +32,20 @@ public class CarTest {
     @Test
     public void sanity() {
         assertNotNull(car);
+    }
+
+    @Test
+    public void ScenarioOneTest(){
+        //start at begi
+        
+        //scan for free parking space
+
+        //move back until most efficient parking space
+
+        //park
+
+        //unpark and drive to end of street
+        
     }
 
     // @Test
@@ -176,4 +193,17 @@ public class CarTest {
         assertEquals(parkCounter, currentPos.getFreeParkingSpaceCounter());
         assertEquals(parkIndex, currentPos.getFreeParkingSpaceIndex());
     }
+
+    //phase 2 TDD
+    @Test
+    public void sensorsReturnValidData() {
+        int[][] sensorData = this.car.getSensor().querySensors();
+        for (int i = 0; i < sensorData.length; i++) {
+            for (int j = 0; j < sensorData[0].length; j++) {
+                int data = sensorData[i][j];
+                assertTrue(data >= 0 && data <=200);
+            }
+        }
+    }
+
 }
