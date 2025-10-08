@@ -1,9 +1,12 @@
 package javaproject;
+
 import org.junit.*;
 import org.junit.runner.RunWith;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -11,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import javaproject.controller.Sensor;
 import javaproject.model.APScar;
 import javaproject.model.CarState;
 
@@ -18,6 +22,7 @@ import javaproject.model.CarState;
 public class CarTest {
     APScar car;
     APScar mockedCar = mock(APScar.class);
+    // APScar spyCar = spy(this.car);
     int ROAD_LENGTH = 500;
 
     @Before // before each test
@@ -35,22 +40,54 @@ public class CarTest {
     }
 
     @Test
-    public void ScenarioOneTest(){
-        //start at begi
+    public void IntegrationTestStartUnparked() {
+        // start at beginning of road
         
-        //scan for free parking space
+        // scan for free parking space with spy map and car
+        when(car.isEmpty()).thenReturn(
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            true,
+            false, 
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
 
-        //move back until most efficient parking space
+        // move back until most efficient parking space
 
-        //park
+        // park
 
-        //unpark and drive to end of street
-        
+        // unpark and drive to end of street
+        car.UnPark();
     }
 
     // @Test
     // public void randomTest() {
-    //     when(this.mockedCar.isEmpty()).thenReturn(false);
+    // when(this.mockedCar.isEmpty()).thenReturn(false);
     // }
 
     @Test
@@ -61,15 +98,17 @@ public class CarTest {
 
     @Test
     public void isNotEmpty() {
-        car.isEmptyReturn = false;
-        boolean isEmpty = this.car.isEmpty();
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(false);
+        boolean isEmpty = spyCar.isEmpty();
         assertEquals(false, isEmpty);
     }
 
     @Test
     public void isEmpty() {
-        car.isEmptyReturn = true;
-        boolean isEmpty = this.car.isEmpty();
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(true);
+        boolean isEmpty = spyCar.isEmpty();
         assertEquals(true, isEmpty);
     }
 
@@ -134,21 +173,23 @@ public class CarTest {
     @Test
     public void parkAtLatestFoundParkingSpace() {
         // assume start somewhere on road
-        car.isEmptyReturn = false;
-        car.getCarState().setFreeParkingSpaceIndex(10);
-        car.getCarState().setPosition(15);
-        car.Park();
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(false);
+        spyCar.getCarState().setFreeParkingSpaceIndex(10);
+        spyCar.getCarState().setPosition(15);
+        spyCar.Park();
 
-        assertEquals(6, car.getCarState().getPosition());
-        assertEquals(true, car.getCarState().getIsParked());
+        assertEquals(6, spyCar.getCarState().getPosition());
+        assertEquals(true, spyCar.getCarState().getIsParked());
     }
 
     @Test
     public void searchForParkingSpaceAndPark() {
-        car.isEmptyReturn = true;
-        car.Park();
-        assertEquals(1, car.getCarState().getPosition());
-        assertEquals(true, car.getCarState().getIsParked());
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(true);
+        spyCar.Park();
+        assertEquals(1, spyCar.getCarState().getPosition());
+        assertEquals(true, spyCar.getCarState().getIsParked());
     }
 
     @Test
@@ -171,12 +212,13 @@ public class CarTest {
 
     @Test
     public void carUnparkWhileParked() {
-        car.isEmptyReturn = true;
-        car.getCarState().setParked(true);
-        int originalPos = car.getCarState().getPosition();
-        car.UnPark();
-        assertEquals(false, car.getCarState().getIsParked());
-        assertEquals(originalPos + 4, car.getCarState().getPosition());
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(true);
+        spyCar.getCarState().setParked(true);
+        int originalPos = spyCar.getCarState().getPosition();
+        spyCar.UnPark();
+        assertEquals(false, spyCar.getCarState().getIsParked());
+        assertEquals(originalPos + 4, spyCar.getCarState().getPosition());
     }
 
     @Test
@@ -194,16 +236,36 @@ public class CarTest {
         assertEquals(parkIndex, currentPos.getFreeParkingSpaceIndex());
     }
 
-    //phase 2 TDD
+    // phase 2 TDD
     @Test
     public void sensorsReturnValidData() {
         int[][] sensorData = this.car.getSensor().querySensors();
         for (int i = 0; i < sensorData.length; i++) {
             for (int j = 0; j < sensorData[0].length; j++) {
                 int data = sensorData[i][j];
-                assertTrue(data >= 0 && data <=200);
+                assertTrue(data >= 0 && data <= 200);
             }
         }
     }
+
+    @Test
+    public void sensorDataIsProcessed() {
+        APScar spyCar = spy(this.car);
+        int mockedSensorData[][] = {
+                { 100, 100, 100, 100, 100 },
+                { 200, 200, 200, 200, 200 }
+        };
+
+        Sensor spySensor = spy(car.getSensor());
+        car.setSensor(spySensor);
+        doReturn(mockedSensorData).when(spySensor).querySensors(); // stub
+
+        int result = car.getSensor().getProcessedSensorData();
+        assertEquals(150, result);
+    }
+
+    // TODO test with failing sensor
+
+    
 
 }

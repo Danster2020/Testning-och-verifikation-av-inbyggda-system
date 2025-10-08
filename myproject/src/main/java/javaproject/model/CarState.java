@@ -5,6 +5,7 @@ public class CarState {
     private boolean isParked;
     private int freeParkingSpaceIndex;
     private int freeParkingSpaceCounter;
+    private int ROAD_LENGTH = 500;
 
     public CarState(){
         position = 0;
@@ -29,6 +30,10 @@ public class CarState {
 
     public int getFreeParkingSpaceCounter() {
         return freeParkingSpaceCounter;
+    }
+
+    public int getRoadLength(){
+        return ROAD_LENGTH;
     }
     
     // Setters

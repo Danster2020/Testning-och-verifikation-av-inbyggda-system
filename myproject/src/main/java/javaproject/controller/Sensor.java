@@ -13,8 +13,6 @@ public class Sensor implements SensorInterface {
     }
 
     public int[][] querySensors() {
-        // int[] s1 = { 143, 177, 187, 199, 184 };
-        // int[] s2 = { 176, 186, 187, 200, 199 };
         int[] s1 = new int[5];
         int[] s2 = new int[5];
         for (int i = 0; i < 5; i++) {
@@ -35,7 +33,7 @@ public class Sensor implements SensorInterface {
             int valueSum = 0;
             int nrOfValues = sensorData[sensor].length;
             for (int value = 0; value < nrOfValues; value++) {
-                valueSum += value;
+                valueSum += sensorData[sensor][value];
             }
             int valueAvg = valueSum / nrOfValues;
             processedSensorData[sensor] = valueAvg;
