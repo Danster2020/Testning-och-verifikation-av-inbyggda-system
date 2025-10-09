@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class CarState {
     private int position;
     private boolean isParked;
-    private int freeParkingSpaceIndex;
+    // private int freeParkingSpaceIndex;
     private int freeParkingSpaceCounter;
     private int ROAD_LENGTH = 500;
 
@@ -17,7 +17,6 @@ public class CarState {
         this.isParked = false;
         // freeParkingSpaceIndex = -1;
         freeParkingSpaceCounter = 0;
-
         this.freeParkingSpaceIndexList = new ArrayList<Integer>();
         this.freeParkingSpaceSizeList = new ArrayList<Integer>();
     }
@@ -32,9 +31,9 @@ public class CarState {
         return isParked;
     }
 
-    public int getFreeParkingSpaceIndex() {
-        return freeParkingSpaceIndex;
-    }
+    // public int getFreeParkingSpaceIndex() {
+    //     return freeParkingSpaceIndex;
+    // }
 
     public int getFreeParkingSpaceCounter() {
         return freeParkingSpaceCounter;
@@ -44,11 +43,11 @@ public class CarState {
         return ROAD_LENGTH;
     }
 
-    public ArrayList getFreeParkingSpaceIndexList() {
+    public ArrayList<Integer> getFreeParkingSpaceIndexList() {
         return this.freeParkingSpaceIndexList;
     }
 
-    public ArrayList getfreeParkingSpaceSizeList() {
+    public ArrayList<Integer> getfreeParkingSpaceSizeList() {
         return this.freeParkingSpaceSizeList;
     }
 
@@ -79,4 +78,5 @@ public class CarState {
     public void setFreeParkingSpaceCounter(int freeParkingSpaceCounter) {
         this.freeParkingSpaceCounter = freeParkingSpaceCounter;
     }
+    
 }

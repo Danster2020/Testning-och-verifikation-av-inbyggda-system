@@ -11,13 +11,13 @@ public class APScar implements CarInterface {
     private Actuator actuator;
 
     // public boolean isEmptyReturn = false; // used for testing
-    ArrayList parkingMap;
+    // ArrayList parkingMap;
 
     public APScar() {
         this.carState = new CarState();
         this.sensor = new Sensor();
         this.actuator = new Actuator();
-        parkingMap = new ArrayList<String>();
+        // parkingMap = new ArrayList<String>();
     }
 
     public CarState MoveForward() {
@@ -34,21 +34,10 @@ public class APScar implements CarInterface {
             carState.setFreeParkingSpaceCounter(0);
         }
 
-        // if (carState.getFreeParkingSpaceCounter() >= 5) {
-        // carState.setFreeParkingSpaceIndex(carState.getPosition());
-        // }
 
         return newCarstate;
     }
 
-    // not in use phase 1
-    // range sensor from 0-200 for next empty space
-    // private int[][] querySensor() {
-    // int[] s1 = { 143, 177, 187, 199, 184 };
-    // int[] s2 = { 176, 186, 187, 200, 199 };
-    // int[][] sDataArray = { s1, s2 };
-    // return sDataArray;
-    // }
 
     public boolean isEmpty() {
         // for future use
@@ -56,33 +45,15 @@ public class APScar implements CarInterface {
         int minimumFreeSpace = 100;
 
         if (sensorDistance < minimumFreeSpace) {
-            System.out.println("[X]");
-            this.parkingMap.add("[X]");
             return false;
         } else {
-            System.out.println("[ ]");
-            this.parkingMap.add("[ ]");
             return true;
         }
 
-        // quick solution for test return
-        // test from isNotEmpty() and IsEmpty()
-        // return this.isEmptyReturn;
     }
 
     public CarState MoveBackward() {
         CarState newCarstate = this.actuator.moveCar(carState, -1);
-        // the parking index and counter updates
-        // if (isEmpty()) {
-        // carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() +
-        // 1);
-        // } else {
-        // carState.setFreeParkingSpaceCounter(0);
-        // }
-
-        // if (carState.getFreeParkingSpaceCounter() >= 5) {
-        // carState.setFreeParkingSpaceIndex(carState.getPosition());
-        // }
 
         if (isEmpty()) {
             carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() + 1);
@@ -107,6 +78,27 @@ public class APScar implements CarInterface {
         return;
     }
 
+    private int getMostEfficientParkingIndex() {
+        ArrayList<Integer> spaceIndexList = this.carState.getFreeParkingSpaceIndexList();
+        ArrayList<Integer> spaceSizeList = this.carState.getfreeParkingSpaceSizeList();
+
+        // if no parking spaces have been found
+        if (spaceIndexList.size() == 0) {
+            return -1;
+        }
+
+        int minFreeSpaceIndex = spaceIndexList.get(0);
+        int minFreeSpaceSize = spaceSizeList.get(0);
+        for (int i = 0; i < spaceIndexList.size(); i++) {
+            int currSize = spaceSizeList.get(i);
+            if (currSize <= minFreeSpaceSize) {
+                minFreeSpaceSize = currSize;
+                minFreeSpaceIndex = spaceIndexList.get(i);
+            }
+        }
+        return minFreeSpaceIndex;
+    }
+
     // park drift style
     public void Park() {
         // if car is already parked
@@ -117,8 +109,8 @@ public class APScar implements CarInterface {
 
         // scenario 1: park at latest found parking space.
         // test from parkAtLatestFoundParkingSpace()
-        int carSpaceIndex = WhereIs().getFreeParkingSpaceIndex();
-        if (carSpaceIndex != -1 && carSpaceIndex < WhereIs().getPosition()) {
+        int carSpaceIndex = getMostEfficientParkingIndex();
+        if (carSpaceIndex != -1) {
             while (WhereIs().getPosition() > carSpaceIndex) {
                 MoveBackward();
             }
@@ -130,6 +122,7 @@ public class APScar implements CarInterface {
         // test from searchForParkingSpaceAndPark()
         while (WhereIs().getFreeParkingSpaceCounter() < 5) {
             MoveForward();
+            // if end of road and no parking space found
             if (WhereIs().getPosition() == 499) {
                 return;
             }
