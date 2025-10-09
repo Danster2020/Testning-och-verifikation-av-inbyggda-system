@@ -1,5 +1,7 @@
 package javaproject.model;
 
+import java.util.ArrayList;
+
 import javaproject.controller.Actuator;
 import javaproject.controller.Sensor;
 
@@ -9,11 +11,13 @@ public class APScar implements CarInterface {
     private Actuator actuator;
 
     // public boolean isEmptyReturn = false; // used for testing
+    ArrayList parkingMap;
 
     public APScar() {
         this.carState = new CarState();
         this.sensor = new Sensor();
         this.actuator = new Actuator();
+        parkingMap = new ArrayList<String>();
     }
 
     public CarState MoveForward() {
@@ -23,12 +27,16 @@ public class APScar implements CarInterface {
         if (isEmpty()) {
             carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() + 1);
         } else {
+            // if just passed a free parking space (5 free spots)
+            if (carState.getFreeParkingSpaceCounter() >= 5) {
+                carState.saveFreeParkingSpaceIndex(carState.getPosition());
+            }
             carState.setFreeParkingSpaceCounter(0);
         }
 
-        if (carState.getFreeParkingSpaceCounter() >= 5) {
-            carState.setFreeParkingSpaceIndex(carState.getPosition());
-        }
+        // if (carState.getFreeParkingSpaceCounter() >= 5) {
+        // carState.setFreeParkingSpaceIndex(carState.getPosition());
+        // }
 
         return newCarstate;
     }
@@ -48,8 +56,12 @@ public class APScar implements CarInterface {
         int minimumFreeSpace = 100;
 
         if (sensorDistance < minimumFreeSpace) {
+            System.out.println("[X]");
+            this.parkingMap.add("[X]");
             return false;
         } else {
+            System.out.println("[ ]");
+            this.parkingMap.add("[ ]");
             return true;
         }
 
@@ -61,15 +73,27 @@ public class APScar implements CarInterface {
     public CarState MoveBackward() {
         CarState newCarstate = this.actuator.moveCar(carState, -1);
         // the parking index and counter updates
+        // if (isEmpty()) {
+        // carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() +
+        // 1);
+        // } else {
+        // carState.setFreeParkingSpaceCounter(0);
+        // }
+
+        // if (carState.getFreeParkingSpaceCounter() >= 5) {
+        // carState.setFreeParkingSpaceIndex(carState.getPosition());
+        // }
+
         if (isEmpty()) {
             carState.setFreeParkingSpaceCounter(carState.getFreeParkingSpaceCounter() + 1);
         } else {
+            // if just passed a free parking space (5 free spots)
+            if (carState.getFreeParkingSpaceCounter() >= 5) {
+                carState.saveFreeParkingSpaceIndex(carState.getPosition());
+            }
             carState.setFreeParkingSpaceCounter(0);
         }
 
-        if (carState.getFreeParkingSpaceCounter() >= 5) {
-            carState.setFreeParkingSpaceIndex(carState.getPosition());
-        }
         return newCarstate;
     }
 
@@ -104,14 +128,13 @@ public class APScar implements CarInterface {
 
         // scenario 2: find parking space and park.
         // test from searchForParkingSpaceAndPark()
-        while (WhereIs().getPosition() < carState.getRoadLength()) {
+        while (WhereIs().getFreeParkingSpaceCounter() < 5) {
             MoveForward();
-            if (WhereIs().getFreeParkingSpaceCounter() >= 5) {
-                // park
-                parallelReverseParkingManeuver();
+            if (WhereIs().getPosition() == 499) {
                 return;
             }
         }
+        parallelReverseParkingManeuver();
 
     }
 
@@ -136,6 +159,7 @@ public class APScar implements CarInterface {
     // return both position and isPark state
     // from test carWhereIs()
     public CarState WhereIs() {
+        // System.out.println(this.carState.getPosition());
         return this.carState;
     }
 
@@ -149,6 +173,10 @@ public class APScar implements CarInterface {
 
     public void setSensor(Sensor sensor) {
         this.sensor = sensor;
+    }
+
+    public Actuator getActuator() {
+        return this.actuator;
     }
 
 }

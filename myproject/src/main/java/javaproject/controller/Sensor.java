@@ -47,4 +47,6 @@ public class Sensor implements SensorInterface {
         System.out.println(sensorValue);
         return sensorValue;
     }
+
+    
 }

@@ -8,10 +8,15 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import javaproject.controller.Sensor;
@@ -44,7 +49,8 @@ public class CarTest {
         // start at beginning of road
         
         // scan for free parking space with spy map and car
-        when(car.isEmpty()).thenReturn(
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(
             false,
             true,
             true,
@@ -77,12 +83,19 @@ public class CarTest {
             false
         );
 
+        // park 
         // move back until most efficient parking space
-
-        // park
+        spyCar.Park();
 
         // unpark and drive to end of street
-        car.UnPark();
+        spyCar.UnPark();
+        int currentPOS = spyCar.WhereIs().getPosition();
+        while(currentPOS < 499){
+            spyCar.MoveForward();
+            currentPOS = spyCar.WhereIs().getPosition();
+            
+        }
+        assertEquals(499, spyCar.WhereIs().getPosition());
     }
 
     // @Test
@@ -229,11 +242,15 @@ public class CarTest {
         boolean parked = car.getCarState().getIsParked();
         int parkIndex = car.getCarState().getFreeParkingSpaceIndex();
         int parkCounter = car.getCarState().getFreeParkingSpaceCounter();
+        ArrayList indexParkList = car.getCarState().getFreeParkingSpaceIndexList();
+        ArrayList indexParkListSize = car.getCarState().getfreeParkingSpaceSizeList();
 
         assertEquals(position, currentPos.getPosition());
         assertEquals(parked, currentPos.getIsParked());
         assertEquals(parkCounter, currentPos.getFreeParkingSpaceCounter());
         assertEquals(parkIndex, currentPos.getFreeParkingSpaceIndex());
+        assertEquals(indexParkList, currentPos.getFreeParkingSpaceIndexList());
+        assertEquals(indexParkListSize, currentPos.getfreeParkingSpaceSizeList());
     }
 
     // phase 2 TDD
@@ -266,6 +283,22 @@ public class CarTest {
 
     // TODO test with failing sensor
 
-    
+    // small test for 100% coverage
 
+    @Test
+    public void parkNoSpaceAvailable(){
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(false);
+        spyCar.Park();
+        assertTrue(spyCar.WhereIs().getPosition() == 499);
+
+    }
+
+    @Test
+    public void testActuatorOutOfBounds(){
+        APScar spyCar = spy(this.car);
+        int currentPOS = spyCar.WhereIs().getPosition();
+        spyCar.getActuator().moveCar(spyCar.WhereIs(), -2);
+        assertEquals(currentPOS, spyCar.WhereIs().getPosition());
+    }
 }
