@@ -19,6 +19,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import javaproject.controller.Sensor;
 import javaproject.model.APScar;
@@ -83,11 +84,6 @@ public class CarTest {
     public void sanity() {
         assertNotNull(car);
     }
-
-    // @Test
-    // public void randomTest() {
-    // when(this.mockedCar.isEmpty()).thenReturn(false);
-    // }
 
     @Test
     public void isNotParked() {
@@ -263,7 +259,6 @@ public class CarTest {
 
         int position = car.getCarState().getPosition();
         boolean parked = car.getCarState().getIsParked();
-        // int parkIndex = car.getCarState().getFreeParkingSpaceIndex();
         int parkCounter = car.getCarState().getFreeParkingSpaceCounter();
         ArrayList<Integer> indexParkList = car.getCarState().getFreeParkingSpaceIndexList();
         ArrayList<Integer> indexParkListSize = car.getCarState().getfreeParkingSpaceSizeList();
@@ -271,7 +266,6 @@ public class CarTest {
         assertEquals(position, currentPos.getPosition());
         assertEquals(parked, currentPos.getIsParked());
         assertEquals(parkCounter, currentPos.getFreeParkingSpaceCounter());
-        // assertEquals(parkIndex, currentPos.getFreeParkingSpaceIndex());
         assertEquals(indexParkList, currentPos.getFreeParkingSpaceIndexList());
         assertEquals(indexParkListSize, currentPos.getfreeParkingSpaceSizeList());
     }
@@ -305,12 +299,30 @@ public class CarTest {
     }
 
     @Test
+    public void allSensorsAreBroken() {
+        APScar spyCar = spy(this.car);
+        int brokenSensorData[][] = {
+                { 20, 130, 43, 160, 83 },
+                { 20, 130, 43, 160, 83 }
+        };
+
+        Sensor spySensor = spy(car.getSensor());
+        car.setSensor(spySensor);
+        doReturn(brokenSensorData).when(spySensor).querySensors(); // stub
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
+            car.getSensor().getProcessedSensorData();
+        });
+
+        assertEquals("All sensors are broken!", exception.getMessage());
+    }
+
+    @Test
     public void parkNoSpaceAvailable() {
         APScar spyCar = spy(this.car);
         when(spyCar.isEmpty()).thenReturn(false);
         spyCar.Park();
         assertTrue(spyCar.WhereIs().getPosition() == 499);
-
     }
 
     @Test
@@ -323,15 +335,8 @@ public class CarTest {
 
     // Integration Tests
 
-    // TODO test with failing sensor halfway trough scenario. Add a scenario where
-    // we feed it
-    // sensordata by mocking querySensors() method and feed it sensordata through a
-    // file.
-
     @Test
     public void IntegrationTestScenarioOneStartUnparked() {
-        // start at beginning of road
-
         // scan for free parking space with spy map and car
         APScar spyCar = spy(this.car);
         when(spyCar.isEmpty()).thenReturn(
@@ -391,22 +396,30 @@ public class CarTest {
 
     @Test
     public void IntegrationTestScenarioBrokenSensor() throws Exception {
-    APScar spyCar = spy(this.car);
-    Sensor spySensor = spy(car.getSensor());
-    spyCar.setSensor(spySensor);
+        // map: 4 free, 2 blocked, 5 free, 1 blocked, 6 free, rest is blocked
+        APScar spyCar = spy(this.car);
+        Sensor spySensor = spy(car.getSensor());
+        car.setSensor(spySensor);
 
-    final List<int[][]> sensorChunks = loadSensorDataChunks("src/test/resources/sensorDataTest.csv", 5);
-    final Iterator<int[][]> iterator = sensorChunks.iterator();
+        // load sensor data
+        final List<int[][]> sensorChunks = loadSensorDataChunks("src/test/resources/sensorDataTest.csv", 5);
+        final Iterator<int[][]> iterator = sensorChunks.iterator();
 
-    when(spySensor.querySensors()).thenAnswer(invocation -> {
-        if (iterator.hasNext()) {
-            return iterator.next();
-        } else {
-            return sensorChunks.get(sensorChunks.size() - 1);
-        }
-    });
+        // when sensors are queried replace with sensor data from file
+        when(spySensor.querySensors()).thenAnswer(invocation -> {
+            // nrOfqueries++;
+            if (iterator.hasNext()) {
+                return iterator.next();
+            } else {
+                return sensorChunks.get(sensorChunks.size() - 1);
+            }
+        });
 
-    spyCar.Park();
+        car.Park();
 
+        // check that sensor is broken and that it parked at the right spot
+        int sensorData = car.getSensor().getProcessedSensorData();
+        assertEquals(50, sensorData);
+        assertEquals(7, car.WhereIs().getPosition());
     }
 }
