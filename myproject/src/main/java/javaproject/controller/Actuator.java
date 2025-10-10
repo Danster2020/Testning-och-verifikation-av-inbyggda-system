@@ -6,7 +6,7 @@ import javaproject.model.ActuatorInterface;
 import javaproject.model.CarState;
 
 public class Actuator implements ActuatorInterface{
-
+    //Tests from both moveBackward() moveForward and testActuatorOutOfBonunds()
     public CarState moveCar(CarState carState, int carCommand){
         if(carCommand == 1){
             // do not move forward if parked

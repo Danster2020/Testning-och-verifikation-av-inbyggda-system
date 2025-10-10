@@ -23,7 +23,7 @@ public class Sensor implements SensorInterface {
         return sDataArray;
     }
 
-    // not in use phase 1
+    //Tested through sensorsReturnValidData(), sensorDataIsProcessed()
     public int getProcessedSensorData() {
         int[][] sensorData = querySensors();
         int nrOfSensors = sensorData.length;

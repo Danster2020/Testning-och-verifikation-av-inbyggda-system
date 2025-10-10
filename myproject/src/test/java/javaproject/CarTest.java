@@ -8,8 +8,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +31,45 @@ public class CarTest {
     // APScar spyCar = spy(this.car);
     int ROAD_LENGTH = 500;
 
+    // helper function
+    private List<int[][]> loadSensorDataChunks(String filePath, int chunkSize) throws IOException {
+        List<Integer> s1List = new ArrayList<>();
+        List<Integer> s2List = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean headerSkipped = false;
+
+            while ((line = br.readLine()) != null) {
+                if (!headerSkipped) { // skip header row
+                    headerSkipped = true;
+                    continue;
+                }
+                String[] values = line.split(",");
+                s1List.add(Integer.parseInt(values[0].trim()));
+                s2List.add(Integer.parseInt(values[1].trim()));
+            }
+        }
+
+        List<int[][]> chunks = new ArrayList<>();
+        for (int i = 0; i < s1List.size(); i += chunkSize) {
+            int[][] chunk = new int[2][chunkSize];
+            for (int j = 0; j < chunkSize; j++) {
+                int index = i + j;
+                if (index < s1List.size()) {
+                    chunk[0][j] = s1List.get(index); // S1
+                    chunk[1][j] = s2List.get(index); // S2
+                } else {
+                    // pad with 0 or last value if not divisible by chunkSize
+                    chunk[0][j] = 0;
+                    chunk[1][j] = 0;
+                }
+            }
+            chunks.add(chunk);
+        }
+        return chunks;
+    }
+
     @Before // before each test
     public void setUp() {
         this.car = new APScar();
@@ -38,60 +82,6 @@ public class CarTest {
     @Test
     public void sanity() {
         assertNotNull(car);
-    }
-
-    @Test
-    public void IntegrationTestStartUnparked() {
-        // start at beginning of road
-        
-        // scan for free parking space with spy map and car
-        APScar spyCar = spy(this.car);
-        when(spyCar.isEmpty()).thenReturn(
-            false,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            false,
-            false,
-            false,
-            true,
-            true,
-            true,
-            true,
-            true,
-            false,
-            false,
-            true,
-            false, 
-            false,
-            true,
-            true,
-            true,
-            true,
-            true,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
-
-        // park 
-        // move back until most efficient parking space
-        spyCar.Park();
-
-        // unpark and drive to end of street
-        spyCar.UnPark();
-        int currentPOS = spyCar.WhereIs().getPosition();
-        while(currentPOS < 499){
-            spyCar.MoveForward();
-            currentPOS = spyCar.WhereIs().getPosition();
-            
-        }
-        assertEquals(499, spyCar.WhereIs().getPosition());
     }
 
     // @Test
@@ -193,16 +183,48 @@ public class CarTest {
         spyCar.getCarState().saveFreeParkingSpaceIndex(10);
         spyCar.Park();
 
-        assertEquals(6, spyCar.getCarState().getPosition());
+        assertEquals(5, spyCar.getCarState().getPosition());
         assertEquals(true, spyCar.getCarState().getIsParked());
     }
 
     @Test
     public void searchForParkingSpaceAndPark() {
         APScar spyCar = spy(this.car);
-        when(spyCar.isEmpty()).thenReturn(true);
+        when(spyCar.isEmpty()).thenReturn(
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false);
         spyCar.Park();
-        assertEquals(1, spyCar.getCarState().getPosition());
+        assertEquals(11, spyCar.getCarState().getPosition());
         assertEquals(true, spyCar.getCarState().getIsParked());
     }
 
@@ -282,12 +304,8 @@ public class CarTest {
         assertEquals(150, result);
     }
 
-    // TODO test with failing sensor halfway trough scenario. Add a scenario where we feed it
-    // sensordata by mocking querySensors() method and feed it sensordata through a file.
-
-
     @Test
-    public void parkNoSpaceAvailable(){
+    public void parkNoSpaceAvailable() {
         APScar spyCar = spy(this.car);
         when(spyCar.isEmpty()).thenReturn(false);
         spyCar.Park();
@@ -296,10 +314,99 @@ public class CarTest {
     }
 
     @Test
-    public void testActuatorOutOfBounds(){
+    public void testActuatorOutOfBounds() {
         APScar spyCar = spy(this.car);
         int currentPOS = spyCar.WhereIs().getPosition();
         spyCar.getActuator().moveCar(spyCar.WhereIs(), -2);
         assertEquals(currentPOS, spyCar.WhereIs().getPosition());
+    }
+
+    // Integration Tests
+
+    // TODO test with failing sensor halfway trough scenario. Add a scenario where
+    // we feed it
+    // sensordata by mocking querySensors() method and feed it sensordata through a
+    // file.
+
+    @Test
+    public void IntegrationTestScenarioOneStartUnparked() {
+        // start at beginning of road
+
+        // scan for free parking space with spy map and car
+        APScar spyCar = spy(this.car);
+        when(spyCar.isEmpty()).thenReturn(
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                true,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false);
+
+        // park
+        // move back until most efficient parking space
+        spyCar.Park();
+
+        assertEquals(21, spyCar.WhereIs().getPosition());
+        // unpark and drive to end of street
+        spyCar.UnPark();
+        int currentPOS = spyCar.WhereIs().getPosition();
+        while (currentPOS < 499) {
+            spyCar.MoveForward();
+            currentPOS = spyCar.WhereIs().getPosition();
+
+        }
+        assertEquals(499, spyCar.WhereIs().getPosition());
+    }
+
+    @Test
+    public void IntegrationTestScenarioBrokenSensor() throws Exception {
+    APScar spyCar = spy(this.car);
+    Sensor spySensor = spy(car.getSensor());
+    spyCar.setSensor(spySensor);
+
+    final List<int[][]> sensorChunks = loadSensorDataChunks("src/test/resources/sensorDataTest.csv", 5);
+    final Iterator<int[][]> iterator = sensorChunks.iterator();
+
+    when(spySensor.querySensors()).thenAnswer(invocation -> {
+        if (iterator.hasNext()) {
+            return iterator.next();
+        } else {
+            return sensorChunks.get(sensorChunks.size() - 1);
+        }
+    });
+
+    spyCar.Park();
+
     }
 }

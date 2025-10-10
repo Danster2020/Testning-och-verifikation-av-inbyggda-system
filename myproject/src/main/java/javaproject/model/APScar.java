@@ -19,6 +19,7 @@ public class APScar implements CarInterface {
         this.actuator = new Actuator();
         // parkingMap = new ArrayList<String>();
     }
+    
 
     public CarState MoveForward() {
 
@@ -45,8 +46,10 @@ public class APScar implements CarInterface {
         int minimumFreeSpace = 100;
 
         if (sensorDistance < minimumFreeSpace) {
+            System.out.println(this.getCarState().getPosition() + ":[X]");
             return false;
         } else {
+            System.out.println(this.getCarState().getPosition() + ":[ ]");
             return true;
         }
 
@@ -111,7 +114,7 @@ public class APScar implements CarInterface {
         // test from parkAtLatestFoundParkingSpace()
         int carSpaceIndex = getMostEfficientParkingIndex();
         if (carSpaceIndex != -1) {
-            while (WhereIs().getPosition() > carSpaceIndex) {
+            while (WhereIs().getPosition() >= carSpaceIndex) {
                 MoveBackward();
             }
             parallelReverseParkingManeuver();
@@ -120,15 +123,18 @@ public class APScar implements CarInterface {
 
         // scenario 2: find parking space and park.
         // test from searchForParkingSpaceAndPark()
-        while (WhereIs().getFreeParkingSpaceCounter() < 5) {
+        while (WhereIs().getPosition() < 499) {
             MoveForward();
-            // if end of road and no parking space found
-            if (WhereIs().getPosition() == 499) {
-                return;
-            }
+        }
+        carSpaceIndex = getMostEfficientParkingIndex();
+        if(carSpaceIndex == -1){
+            return;
+        }
+        while (WhereIs().getPosition() >= carSpaceIndex) {
+                MoveBackward();
         }
         parallelReverseParkingManeuver();
-
+        return;
     }
 
     // unpark like a king
