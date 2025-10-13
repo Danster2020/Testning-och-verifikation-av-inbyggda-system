@@ -10,24 +10,25 @@ public class APScar implements CarInterface {
 
     public CarState MoveForward() {
 
+        // from test carMovesForwardWhileParked()
         // do not move forward if parked
-        //from test carMovesForwardWhileParked()
         if (WhereIs().getIsParked() == true) {
             return this.WhereIs();
         }
 
+        // test from carMovesForwardAtEndOfRoad()
         // do not move forward if end of road
-        //test from carMovesForwardAtEndOfRoad()
         int currPos = this.WhereIs().getPosition();
         if (currPos == ROAD_LENGTH - 1) {
             return this.WhereIs();
         }
 
-        // Move car forward 1 meter, max 500, update parking pace index and parking space counter
-        //test from carMovesForward()
+        // test from carMovesForward()
+        // Move car forward 1 meter, max 500, update parking pace index and parking
+        // space counter
         this.WhereIs().setPosition(WhereIs().getPosition() + 1);
 
-        //the parking index and counter updates
+        // the parking index and counter updates
         if (isEmpty()) {
             this.WhereIs().setFreeParkingSpaceCounter(WhereIs().getFreeParkingSpaceCounter() + 1);
         } else {
@@ -41,74 +42,65 @@ public class APScar implements CarInterface {
         return this.WhereIs();
     }
 
-    //not in use phase 1
+    // not in use phase 1
     // range sensor from 0-200 for next empty space
-    private int[][] querySensor() {
-        int[] s1 = { 143, 177, 187, 199, 184 };
-        int[] s2 = { 176, 186, 187, 200, 199 };
-        int[][] sDataArray = { s1, s2 };
-        return sDataArray;
-    }
+    // private int[][] querySensor() {
+    //     int[] s1 = { 143, 177, 187, 199, 184 };
+    //     int[] s2 = { 176, 186, 187, 200, 199 };
+    //     int[][] sDataArray = { s1, s2 };
+    //     return sDataArray;
+    // }
 
-    //not in use phase 1
-    private int processSensorData() {
-        int[][] sensorData = querySensor();
-        int nrOfSensors = sensorData.length;
-        int[] processedSensorData = new int[nrOfSensors];
+    // not in use phase 1
+    // private int processSensorData() {
+    //     int[][] sensorData = querySensor();
+    //     int nrOfSensors = sensorData.length;
+    //     int[] processedSensorData = new int[nrOfSensors];
 
-        for (int sensor = 0; sensor < nrOfSensors; sensor++) {
-            int valueSum = 0;
-            int nrOfValues = sensorData[sensor].length;
-            for (int value = 0; value < nrOfValues; value++) {
-                valueSum += value;
-            }
-            int valueAvg = valueSum / nrOfValues;
-            processedSensorData[sensor] = valueAvg;
-        }
+    //     for (int sensor = 0; sensor < nrOfSensors; sensor++) {
+    //         int valueSum = 0;
+    //         int nrOfValues = sensorData[sensor].length;
+    //         for (int value = 0; value < nrOfValues; value++) {
+    //             valueSum += value;
+    //         }
+    //         int valueAvg = valueSum / nrOfValues;
+    //         processedSensorData[sensor] = valueAvg;
+    //     }
 
-        int totalSum = 0;
-        for (int value : processedSensorData) {
-            totalSum += value;
-        }
-        int sensorValue = totalSum / nrOfSensors;
-        System.out.println(sensorValue);
-        return sensorValue;
-    }
+    //     int totalSum = 0;
+    //     for (int value : processedSensorData) {
+    //         totalSum += value;
+    //     }
+    //     int sensorValue = totalSum / nrOfSensors;
+    //     System.out.println(sensorValue);
+    //     return sensorValue;
+    // }
 
     public boolean isEmpty() {
-        // for future use
-        // int sensorDistance = processSensorData();
-        // int minimumFreeSpace = 100;
-
-        // if (sensorDistance < minimumFreeSpace) {
-        // return false;
-        // } else {
-        // return true;
-        // }
-
-        //quick solution for test return 
-        //test from isNotEmpty() and IsEmpty()
+        // test from isNotEmpty() and IsEmpty()
+        // quick solution for test return
         return this.isEmptyReturn;
     }
 
     public CarState MoveBackward() {
+        // from test carMovesBackwardWhileParked()
         // do not move backward if parked
-        //from test carMovesBackwardWhileParked()
         if (WhereIs().getIsParked() == true) {
             return this.WhereIs();
         }
 
-        // if start of street do not move backwards 
-        //test from carMovesBackwardAtStartOfStreet()
+        // test from carMovesBackwardAtStartOfStreet()
+        // if start of street do not move backwards
         if (this.WhereIs().getPosition() == 0) {
             return this.WhereIs();
         }
 
-        // Move car back 1 meter, max 500, update parking pace index and parking space counter
-        //test from carMovesBackward()
+        // test from carMovesBackward()
+        // Move car back 1 meter, max 500, update parking pace index and parking space
+        // counter
         this.WhereIs().setPosition(WhereIs().getPosition() - 1);
 
-        //the parking index and counter updates
+        // the parking index and counter updates
         if (isEmpty()) {
             this.WhereIs().setFreeParkingSpaceCounter(WhereIs().getFreeParkingSpaceCounter() + 1);
         } else {
@@ -123,8 +115,8 @@ public class APScar implements CarInterface {
     }
 
     private void parallelReverseParkingManeuver() {
-        //auto park function that parkes at current park index when at correct index
-        //called from park() 
+        // auto park function that parkes at current park index when at correct index
+        // called from park()
         isEmptyReturn = true;
         for (int i = 0; i < 4; i++) {
             MoveBackward();
@@ -135,14 +127,14 @@ public class APScar implements CarInterface {
 
     // park drift style
     public void Park() {
-        //if car is already parked
-        //test from carParkWhileParked()
+        // test from carParkWhileParked()
+        // if car is already parked
         if (getCarState().getIsParked() == true) {
             return;
         }
 
+        // test from parkAtLatestFoundParkingSpace()
         // scenario 1: park at latest found parking space.
-        //test from parkAtLatestFoundParkingSpace()
         int carSpaceIndex = WhereIs().getFreeParkingSpaceIndex();
         if (carSpaceIndex != -1 && carSpaceIndex < WhereIs().getPosition()) {
             while (WhereIs().getPosition() > carSpaceIndex) {
@@ -152,8 +144,8 @@ public class APScar implements CarInterface {
             return;
         }
 
+        // test from searchForParkingSpaceAndPark()
         // scenario 2: find parking space and park.
-        //test from searchForParkingSpaceAndPark()
         while (WhereIs().getPosition() < ROAD_LENGTH) {
             MoveForward();
             if (WhereIs().getFreeParkingSpaceCounter() >= 5) {
@@ -167,14 +159,14 @@ public class APScar implements CarInterface {
 
     // unpark like a king
     public void UnPark() {
+        // test from carUnParkWhileUnParked()
         // if car is already unparked
-        //test from carUnParkWhileUnParked()
         if (WhereIs().getIsParked() == false) {
             return;
         }
 
-        // car unparks while it is parked.
         // test from carUnparkWhileParked()
+        // car unparks while it is parked.
         this.WhereIs().setParked(false);
         // very important set 1
         this.WhereIs().setFreeParkingSpaceCounter(1);
@@ -183,12 +175,13 @@ public class APScar implements CarInterface {
         }
     }
 
+    // from test carWhereIs()
     // return both position and isPark state
-    //from test carWhereIs()
     public CarState WhereIs() {
         return this.carState;
     }
 
+    // used internally
     public CarState getCarState() {
         return this.carState;
     }

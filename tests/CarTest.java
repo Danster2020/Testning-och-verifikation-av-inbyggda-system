@@ -16,12 +16,14 @@ public class CarTest {
         this.car.getCarState().setParked(false);
     }
 
+    // tests that the default state of the car is in an unparked state.
     @Test
     public void isNotParked() {
         boolean isParked = car.WhereIs().getIsParked();
         assertEquals(false, isParked);
     }
 
+    // tests that the isEmpty method returns false when mocked as false.
     @Test
     public void isNotEmpty() {
         car.isEmptyReturn = false;
@@ -29,6 +31,7 @@ public class CarTest {
         assertEquals(false, isEmpty);
     }
 
+    // tests that the isEmpty method returns true when mocked as true.
     @Test
     public void isEmpty() {
         car.isEmptyReturn = true;
@@ -36,6 +39,8 @@ public class CarTest {
         assertEquals(true, isEmpty);
     }
 
+    // tests that the car can move forward and that its position
+    // updades accordingly.
     @Test
     public void carMovesForward() {
         int orgPos = car.getCarState().getPosition();
@@ -46,6 +51,7 @@ public class CarTest {
         assertEquals(1, deltaPos);
     }
 
+    // test that the car cant move forward while parked.
     @Test
     public void carMovesForwardWhileParked() {
         car.getCarState().setParked(true);
@@ -55,6 +61,7 @@ public class CarTest {
         assertEquals(orgPos, car.getCarState().getPosition());
     }
 
+    // tests that the car doesnt move forward at end of road
     @Test
     public void carMovesForwardAtEndOfRoad() {
         int posEndOfRoad = ROAD_LENGTH - 1;
@@ -66,6 +73,8 @@ public class CarTest {
         assertEquals(orgPos, newPos);
     }
 
+    // tests that the car can move backward and that its position
+    // updades accordingly.
     @Test
     public void carMovesBackward() {
         car.getCarState().setPosition(1);
@@ -77,6 +86,7 @@ public class CarTest {
         assertEquals(1, deltaPos);
     }
 
+    // tests that the car doesnt move backward at start of road
     @Test
     public void carMovesBackwardAtStartOfStreet() {
         car.MoveBackward();
@@ -84,6 +94,7 @@ public class CarTest {
         assertEquals(0, newPos);
     }
 
+    // tests that the car cant move backward while parked
     @Test
     public void carMovesBackwardWhileParked() {
         car.getCarState().setParked(true);
@@ -94,6 +105,8 @@ public class CarTest {
         assertEquals(orgPos, car.getCarState().getPosition());
     }
 
+    // tests that the car can park at the latest found parking space
+    // and that it parks in the right index.
     @Test
     public void parkAtLatestFoundParkingSpace() {
         // assume start somewhere on road
@@ -106,6 +119,8 @@ public class CarTest {
         assertEquals(true, car.getCarState().getIsParked());
     }
 
+    // tests that the car can search for a parking space while
+    // traversing the street and then park.
     @Test
     public void searchForParkingSpaceAndPark() {
         car.isEmptyReturn = true;
@@ -114,6 +129,7 @@ public class CarTest {
         assertEquals(true, car.getCarState().getIsParked());
     }
 
+    // tests that the park cant park while already parked
     @Test
     public void carParkWhileParked() {
         car.getCarState().setParked(true);
@@ -124,6 +140,7 @@ public class CarTest {
         assertEquals(orgPos, car.getCarState().getPosition());
     }
 
+    // tests that the park cant unpark while already unparked
     @Test
     public void carUnParkWhileUnParked() {
         int orgPos = car.getCarState().getPosition();
@@ -132,6 +149,7 @@ public class CarTest {
         assertEquals(orgPos, car.getCarState().getPosition());
     }
 
+    // tests that the car can unpark while parked.
     @Test
     public void carUnparkWhileParked() {
         car.isEmptyReturn = true;
@@ -142,6 +160,8 @@ public class CarTest {
         assertEquals(originalPos + 4, car.getCarState().getPosition());
     }
 
+    // tests that the carWhereIs method returns the cars status properties
+    // correctly.
     @Test
     public void carWhereIs() {
         CarState currentPos = car.WhereIs();
